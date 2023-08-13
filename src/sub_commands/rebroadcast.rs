@@ -38,10 +38,10 @@ pub fn rebroadcast(
         "issues",
         "comments",
     ] { 
-        if !repo_dir_path.join(".ngit").exists() {
+        if !repo_dir_path.join(".gnostr").exists() {
             println!("this isn't a repository here to rebroadcast")
         }
-        let dir_path = repo_dir_path.join(".ngit").join(&dir_name);
+        let dir_path = repo_dir_path.join(".gnostr").join(&dir_name);
         if dir_path.exists() {
             let dir = fs::read_dir(&dir_path)
                 .expect("read_dir to produce ReadDir from a path that exists");
@@ -53,7 +53,7 @@ pub fn rebroadcast(
                 // send event
                 match client.send_event(
                     load_event(&path)
-                        .expect("every file in .ngit paths is a valid json event")
+                        .expect("every file in .gnostr paths is a valid json event")
                 ) {
                     Ok(_) => {
                         println!("sent: {}", &path.to_string_lossy());

@@ -19,9 +19,9 @@ mod cli_helpers;
 
 /// Simple CLI application to use git through nostr
 #[derive(Parser)]
-#[command(name = "ngit")]
-#[command(author = "DanConwayDev <DanConwayDev@protonmail.com")]
-#[command(version = "0.0.1")]
+#[command(name = "gnostr-cli")]
+#[command(author = "DanConwayDev <DanConwayDev@protonmail.com, admin@gnostr.org <admin@gnostr.org>")]
+#[command(version = "0.0.0")]
 #[command(author, version, about, long_about = None)]
 struct Cli {
     #[command(subcommand)]
@@ -53,7 +53,7 @@ enum Commands {
 }
 
 fn main() -> Result<()> {
-    println!("ngit prototype v0.0.1-alpha");
+    println!("gnostr-cli prototype v0.0.0-alpha");
     // Parse input
     let args: Cli = Cli::parse();
 

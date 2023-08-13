@@ -134,7 +134,7 @@ pub fn get_updates_of_patches (
                 None => {
                     // loop for parent locally
                     if repo_dir_path.join(format!(
-                        ".ngit/patches/{}.json",
+                        ".gnostr/patches/{}.json",
                         patch_commit_id,
                     )).exists() {
                 // break out of loop when we identify the commit where the branch begins
@@ -223,7 +223,7 @@ pub fn get_updates_of_patches (
                     let next_patch = match patch_events.iter().find(|event|event.id.to_string() == tag_extract_value(t)) {
                         None => {
                             let patch_path = repo_dir_path.join(format!(
-                                ".ngit/patches/{}.json",
+                                ".gnostr/patches/{}.json",
                                 tag_extract_value(
                                     next_parent_patch.tags.iter().find(|t|tag_is_commit_parent(t))
                                     .expect("patch to always have a commit parent if it has a patch parent")
@@ -248,7 +248,7 @@ pub fn get_updates_of_patches (
                     if commit_ids_in_branch.iter().any(|id|
                         patch_commit_id(&next_patch) == id.to_string()
                     ) {
-                        panic!("force push detected. This branch has been force pushed since you last pulled. ngit doesnt handle this yet");
+                        panic!("force push detected. This branch has been force pushed since you last pulled. gnostr-cli doesnt handle this yet");
                         }
                     // new patch
                     new_patches_on_branch.push(next_patch.clone());

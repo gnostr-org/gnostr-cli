@@ -89,7 +89,7 @@ fn get_repo(
     relays:&Vec<String>,
     repo_id: EventId,
 ) -> Repo {
-    let json_path = current_dir().unwrap().join(".ngit/repo.json");
+    let json_path = current_dir().unwrap().join(".gnostr/repo.json");
 
     if json_path.exists() {
         Repo::new_from_event(
@@ -196,9 +196,9 @@ fn setup_dir(repo: &Repo,) -> (PathBuf, Repository) {
         else { break proposed_name; }
     };
     let repo_dir_path = std::env::current_dir().unwrap().join(&repo_dir_name);
-    let ngit_path = repo_dir_path.join(".ngit");
+    let ngit_path = repo_dir_path.join(".gnostr");
     
-    // create .ngit folder and store the repo and group reference and associated events (?)
+    // create .gnostr folder and store the repo and group reference and associated events (?)
     for p in [
         "groups",
         "branches",
@@ -218,6 +218,6 @@ fn setup_dir(repo: &Repo,) -> (PathBuf, Repository) {
         ngit_path.join("repo.json"),
         &repo.events[0],
     )
-        .expect("save_event to repo.json to in .ngit directory");
+        .expect("save_event to repo.json to in .gnostr directory");
     (repo_dir_path, git_repo)
 }

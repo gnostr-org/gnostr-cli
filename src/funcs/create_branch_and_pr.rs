@@ -101,11 +101,11 @@ pub fn create_branch_and_pr(
         None,
         &keys.public_key(),
     )
-        .expect("main repo maintainers group is cached in .ngit")
+        .expect("main repo maintainers group is cached in .gnostr")
     {
         // use repo maintainers group
         true => branch_refs.maintainers_group(None)
-            .expect("main repo maintainers group is cached in .ngit")
+            .expect("main repo maintainers group is cached in .gnostr")
             .get_ref(),
         // create branch group
         false => {
@@ -126,7 +126,7 @@ pub fn create_branch_and_pr(
                         vec![keys.public_key().to_string()],
                         vec![
                             branch_refs.maintainers_group(None)
-                                .expect("repo maintainers group to exist in .ngit directory")
+                                .expect("repo maintainers group to exist in .gnostr directory")
                                 .get_ref()
                         ]
                     )

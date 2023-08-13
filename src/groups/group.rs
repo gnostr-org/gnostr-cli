@@ -13,8 +13,8 @@ pub enum Error {
     /// Error processing initialisation group content json - incorrect format?
     #[error("group cannot be initialised from content: {0}")]
     InitializeJson(#[from] init::Error),
-    /// Error group is not avialable locally in .ngit
-    #[error("group is not available in .ngit/groups/{0}.json")]
+    /// Error group is not avialable locally in .gnostr
+    #[error("group is not available in .gnostr/groups/{0}.json")]
     GroupJsonNotAvailable(String),
 }
 
@@ -125,7 +125,7 @@ impl Group {
 
     pub fn open (group_id:String, repo_dir_path:&PathBuf) -> Result<Self,Error> {
         let path = repo_dir_path.join(
-            format!(".ngit/groups/{}.json",group_id)
+            format!(".gnostr/groups/{}.json",group_id)
         );
         if path.exists() {
             Ok(

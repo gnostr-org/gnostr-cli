@@ -15,9 +15,9 @@ impl Groups {
         let cur_dir = std::env::current_dir().unwrap();
         
         // check for potential problems
-        let ngit_path = cur_dir.clone().join(".ngit");
+        let ngit_path = cur_dir.clone().join(".gnostr");
         if !ngit_path.is_dir() {
-            panic!("ngit not initialised. Run 'ngit init' first...");
+            panic!(".gnostr not initialised. Run 'gnostr-cli init' first...");
         }
 
         let mut groups = vec![];

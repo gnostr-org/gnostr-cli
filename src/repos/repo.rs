@@ -39,7 +39,7 @@ impl Repo {
     pub fn open(repo_dir_path: &PathBuf) -> Self {
         Repo::new_from_json_event(
             load_file(
-                repo_dir_path.join(".ngit/repo.json"),
+                repo_dir_path.join(".gnostr/repo.json"),
             )
                 .expect("repo.json load from file")
         )

@@ -20,8 +20,8 @@ pub fn initialize_pull_request(
         tag_into_event(tag_branch(to_branch_id)),
         tag_branch_merge_from(from_branch_id),
         tag_into_event(tag_branch_merge_from(from_branch_id)),
-        tag_hashtag("ngit-event"),
-        tag_hashtag("ngit-format-0.0.1"),
+        tag_hashtag("gnostr-event"),
+        tag_hashtag("gnostr-format-0.0.0"),
 ];
     for t in hashtags.iter() {
         tags.push(

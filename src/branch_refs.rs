@@ -28,7 +28,7 @@ impl BranchRefs {
 
         // add repo first branch in branches vector
         refs.update(
-            load_event(refs.repo_dir_path.join(".ngit/repo.json"))
+            load_event(refs.repo_dir_path.join(".gnostr/repo.json"))
                 .expect("repo.json to be present and load as event")
         );
 
@@ -39,7 +39,7 @@ impl BranchRefs {
             "merges",
             "prs",
         ] {
-            let dir_path = refs.repo_dir_path.join(".ngit").join(&dir_name);
+            let dir_path = refs.repo_dir_path.join(".gnostr").join(&dir_name);
             if dir_path.exists() {
                 let dir = fs::read_dir(&dir_path)
                     .expect("read_dir to produce ReadDir from a path that exists");
@@ -47,10 +47,10 @@ impl BranchRefs {
                     let path = entry
                         .expect("DirEntry to return from ReadDir")
                         .path();
-                    // load each BranchRef event in .ngit and call update
+                    // load each BranchRef event in .gnostr and call update
                     refs.update(
                         load_event(path)
-                            .expect("every file in .ngit paths is a valid json event")
+                            .expect("every file in .gnostr paths is a valid json event")
                     );
                 }
             }
@@ -138,10 +138,10 @@ impl BranchRefs {
             _ => None,
         };
 
-        // store events in .ngit directory
+        // store events in .gnostr directory
         match dir_name {
             Some(dir_name) => {
-                let path = self.repo_dir_path.join(".ngit").join(format!("{}/{}.json",dir_name, event_to_store.id));
+                let path = self.repo_dir_path.join(".gnostr").join(format!("{}/{}.json",dir_name, event_to_store.id));
                 if !path.exists() {
                     save_event(&path, &event_to_store)
                     .expect(format!("save_event will store BranchRefs event in {}",&path.to_string_lossy()).as_str());

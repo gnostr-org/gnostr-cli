@@ -21,8 +21,8 @@ pub fn initialize_merge(
         tag_patch(patch_id),
         tag_into_event(tag_patch(patch_id)),
         tag_commit(commit_id),
-        tag_hashtag("ngit-event"),
-        tag_hashtag("ngit-format-0.0.1"),
+        tag_hashtag("gnostr-event"),
+        tag_hashtag("gnostr-format-0.0.0"),
 ];
     EventBuilder::new(
         Kind::Merge.into_sdk_custom_kind(),

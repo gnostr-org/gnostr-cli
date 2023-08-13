@@ -20,13 +20,13 @@ impl ::std::default::Default for MyConfig {
 }
 
 pub fn load_config() -> MyConfig {
-    confy::load("ngit-cli", None)
-        .expect("load_config always to load confy custom config or defaults for ngit-cli")
+    confy::load("gnostr-cli", None)
+        .expect("load_config always to load confy custom config or defaults for gnostr-cli")
 }
 
 pub fn save_conifg(cfg:&MyConfig) -> &MyConfig {
-    confy::store("ngit-cli",None, &cfg)
-        .expect("save_conifg always to save confy custom config or defaults for ngit-cli and return it");
+    confy::store("gnostr-cli",None, &cfg)
+        .expect("save_conifg always to save confy custom config or defaults for gnostr-cli and return it");
     cfg
 }
 

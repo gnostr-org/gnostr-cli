@@ -121,16 +121,16 @@ fn get_merge_patch(
         Some(patch) => patch.clone(),
         None => {
             let patch_path = repo_dir_path.join(format!(
-                ".ngit/patches/{}.json",
+                ".gnostr/patches/{}.json",
                 commit_id
             ));
             if patch_path.exists() {
-                // found merge patch in .ngit/patches
+                // found merge patch in .gnostr/patches
                 load_event(patch_path)
                     .expect("patch at path that exists renders as event")
             }
             else {
-                panic!("cannot find patch from merge event in event vector or .ngit folder");
+                panic!("cannot find patch from merge event in event vector or .gnostr folder");
             }
         },
     }

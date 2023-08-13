@@ -17,14 +17,14 @@ pub struct RepoConfig {
 impl RepoConfig {
 
     pub fn open(repo_dir_path: &PathBuf) -> Self {
-        let path = repo_dir_path.join(".ngit/config.json");
+        let path = repo_dir_path.join(".gnostr/config.json");
         if path.exists() {
             let repo_config: Self = serde_json::from_str(
                 load_file(path)
                     .expect("config json to load from file")
                     .as_str()
             )
-                .expect("config.json to deserialize into RepoConfig");
+                .expect(".gnostr/config.json to deserialize into RepoConfig");
             repo_config
         }
         else {
@@ -39,13 +39,13 @@ impl RepoConfig {
     }
     
     fn save(&self) {
-        let path = self.repo_dir_path.join(".ngit/config.json");
+        let path = self.repo_dir_path.join(".gnostr/config.json");
         let mut f = File::create(path)
             .expect("config.json to open using File::Create");
         f.write_all(
             serde_json::json!(self).to_string().as_bytes()
         )
-            .expect("write_all to write serialized RepoConfig to config.json");
+            .expect("write_all to write serialized RepoConfig to .gnostr/config.json");
     }
 
     pub fn set_mapping(&mut self, branch_name:&String, branch_id:&String) {
@@ -114,7 +114,7 @@ impl RepoConfig {
 
     fn check_local_branch_exists(&self, branch_name: &String) -> bool {
         match git2::Repository::open(&self.repo_dir_path)
-            .expect("git repo not initialized. run ngit init first")
+            .expect("git repo not initialized. run gnostr-cli init first")
             .find_branch(branch_name, git2::BranchType::Local)
         {
             Ok(_) => true,

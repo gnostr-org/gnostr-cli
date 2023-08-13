@@ -19,7 +19,7 @@ pub fn create_and_broadcast_patches_from_oid(
                 &oid,
                 &patches,
                 &git_repo,
-                &repo_dir_path.join(".ngit"),
+                &repo_dir_path.join(".gnostr"),
                 &repo,
                 &branch_id,
                 &keys,
@@ -96,7 +96,7 @@ pub fn create_and_save_patch_from_oid(
                             .expect("patch in json file that exists produces valid event")
                             .id.to_string()
                     } else {
-                        panic!("cannot find parent patch. ngit may have ordered ancestors without patches incorrectly");
+                        panic!("cannot find parent patch. gnostr-cli may have ordered ancestors without patches incorrectly");
                     }
                 },
             }

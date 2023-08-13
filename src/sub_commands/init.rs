@@ -36,10 +36,10 @@ pub fn create_and_broadcast_init(
     let repo_dir_path = std::env::current_dir().unwrap();
     
     // check for potential problems
-    let ngit_path = repo_dir_path.clone().join(".ngit");
+    let ngit_path = repo_dir_path.clone().join(".gnostr");
     if ngit_path.is_dir() && (
         !Confirm::with_theme(&ColorfulTheme::default())
-            .with_prompt("ngit already initialized! Do you want overwrite it with a fresh repoisotry?")
+            .with_prompt(".gnostr already initialized! Do you want overwrite it with a fresh repoisotry?")
             .default(false)
             .interact()
             .unwrap()
@@ -48,12 +48,12 @@ pub fn create_and_broadcast_init(
             .default(false)
             .interact()
             .unwrap()
-    ) { panic!("aborted as ngit repository already exists."); };
+    ) { panic!("aborted as .gnostr repository already exists."); };
 
     let git_path = repo_dir_path.clone().join(".git");
     if git_path.is_dir() && (
         !Confirm::with_theme(&ColorfulTheme::default())
-            .with_prompt("git has already been initialized here. For this alpha ngit prototype its best to start with a fresh repository. Continue anyway?")
+            .with_prompt("git has already been initialized here. For this alpha gnostr-cli prototype its best to start with a fresh repository. Continue anyway?")
             .default(false)
             .interact()
             .unwrap()
@@ -133,7 +133,7 @@ pub fn create_and_broadcast_init(
 
     let new_repo_group = Group::new(
         &InitializeGroup::new()
-            .name(format!("{repo_name} maintainers (ngit)"))
+            .name(format!("{repo_name} maintainers (gnostr)"))
             .members(
                 repo_group_members,
                 vec![],
@@ -154,7 +154,7 @@ pub fn create_and_broadcast_init(
     ).unwrap();    
     events_to_broadcast.push(new_repo.events[0].clone());   
 
-    // crate .ngit folder and store the repo and group reference and associated events (?)
+    // crate .gnostr folder and store the repo and group reference and associated events (?)
     for p in [
         "groups",
         "branches",
@@ -203,8 +203,8 @@ pub fn create_and_broadcast_init(
         File::create(gitignore_path)
             .expect("create and open .gitignore file")
     };
-    writeln!(gitignore_file, ".ngit")
-        .expect(".ngit added to gitignore");
+    writeln!(gitignore_file, ".gnostr")
+        .expect(".gnostr added to gitignore");
 
     let spinner = ProgressBar::new_spinner();
     spinner.set_message("Broadcasting... if this takes 20s+, there was a problem broadcasting to one or more relays even if it says 'Repository Initialised'.");
@@ -232,9 +232,9 @@ pub fn create_and_broadcast_init(
 
     // Instructions:
     // 1. make some commits on 'master' or 'main' branch.
-    // 2. 'ngit push' will push them to the nostr repo (via a patch).
+    // 2. 'gnostr-cli push' will push them to the gnostr repo (via a patch).
     // 3. make a branch called 'feature-1'
-    // 3. 'ngit push' will create a PR
+    // 3. 'gnostr-cli push' will create a PR
 
     // repo
         // repo 

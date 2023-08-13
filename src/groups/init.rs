@@ -35,8 +35,8 @@ impl InitializeGroup {
 
     fn generate_tags(&self) -> Vec<Tag> {
         let mut tags:Vec<Tag> = vec![
-            tag_hashtag("ngit-event"),
-            tag_hashtag("ngit-format-0.0.1"),
+            tag_hashtag("gnostr-event"),
+            tag_hashtag("gnostr-format-0.0.0"),
         ];
         for m in &self.direct_members {
             let key = XOnlyPublicKey::from_str(m);

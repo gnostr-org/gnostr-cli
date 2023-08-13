@@ -38,8 +38,8 @@ impl InitializeRepo {
             self.maintainers_group.as_ref()
                 .expect("there always to be a maintainers group when initialising")
                 .clone(),
-            tag_hashtag("ngit-event"),
-            tag_hashtag("ngit-format-0.0.1"),
+            tag_hashtag("gnostr-event"),
+            tag_hashtag("gnostr-format-0.0.0"),
         ];
         if !self.relays.is_empty() {
             tags.push(

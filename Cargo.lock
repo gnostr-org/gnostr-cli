@@ -559,6 +559,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "gnostr-cli"
+version = "0.0.2"
+dependencies = [
+ "clap",
+ "confy",
+ "dialoguer",
+ "git2",
+ "indicatif",
+ "nostr",
+ "nostr-sdk",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "h2"
 version = "0.3.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -877,22 +893,6 @@ dependencies = [
  "log",
  "wasi",
  "windows-sys 0.45.0",
-]
-
-[[package]]
-name = "ngit"
-version = "0.0.2"
-dependencies = [
- "clap",
- "confy",
- "dialoguer",
- "git2",
- "indicatif",
- "nostr",
- "nostr-sdk",
- "serde",
- "serde_json",
- "thiserror",
 ]
 
 [[package]]

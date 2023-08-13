@@ -28,7 +28,7 @@ pub fn find_commits_ahead (
 
     for oid in revwalk {
         // whatever branch we are on, we are only interested in returning how many unpublished commits we are ahead.
-        if repo_dir_path.join(".ngit").join(format!(
+        if repo_dir_path.join(".gnostr").join(format!(
             "patches/{}.json",
             oid.as_ref().expect("oid to refernce commits").clone(),
         )).exists()  { 

@@ -13,13 +13,13 @@ pub fn apply_patches(
 
 ) {
     // check git is installed
-    match Command::new("git").output() {
+    match Command::new("gnostr-git").output() {
         Ok(_o) => (),
         Err(_e) => {
-            panic!("git isn't installed :( Install git and then you can use ngit :)");
+            panic!("gnostr-git isn't installed :( Install gnostr-git and then you can use gnostr-cli :)");
         }
     }
-    let ngit_path = repo_dir_path.join(".ngit");
+    let ngit_path = repo_dir_path.join(".gnostr");
 
     println!("{} commits to apply",patches_correctly_ordered.len());
     fs::create_dir(ngit_path.join("patches/mbox"))
@@ -44,7 +44,7 @@ pub fn apply_patches(
             .expect("can use write_all to write event content to patch file");
         // gitoxide or libgit2 do not support applying patches whilst maintaining the commit ids so we fall back to indirectly using git
         // it turns out that git am doesnt retain commit ids. for now we will modify the committer author and timestamp to correct the commit id.
-        match Command::new("git")
+        match Command::new("gnostr-git")
         .current_dir(&repo_dir_path)
         .args([
             "am",
@@ -86,7 +86,7 @@ pub fn apply_patches(
                     }
                 };
             },
-            Err(_e) => { panic!(":( git error: {:#?}",_e); },
+            Err(_e) => { panic!(":( gnostr-git error: {:#?}",_e); },
         }
     }
     // clear up by removing mbox directory

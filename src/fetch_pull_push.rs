@@ -24,10 +24,10 @@ pub fn fetch_pull_push(
     };
 
     let git_repo = git2::Repository::open(&repo_dir_path)
-        .expect("git repo not initialized. run ngit init first");
+        .expect(".gnostr repo not initialized. run gnostr-cli init first");
 
-    if !repo_dir_path.join(".ngit").is_dir() {
-        panic!("ngit not initialised. Run 'ngit init' first...");
+    if !repo_dir_path.join(".gnostr").is_dir() {
+        panic!(".gnostr not initialised. Run 'gnostr-cli init' first...");
     }
 
     let repo_has_no_commits = git_repo.branches(Some(BranchType::Local))
@@ -79,7 +79,7 @@ pub fn fetch_pull_push(
         }
         Some(
             head.shorthand()
-                .expect("head is branch so head.shortand() should retunr branch name")
+                .expect("head is branch so head.shortand() should return branch name")
                 .to_string()
         )
     };
@@ -351,12 +351,12 @@ pub fn fetch_pull_push(
     // [ ] ignore commit(s) 
 
 
-        // let ngit_path = repo_dir_path.join(".ngit");
+        // let gnostr_path = repo_dir_path.join(".gnostr");
     // // CURRENTLY UNUSED identify new merges 
     // let new_merge_ids: Vec<&String> = branch_refs.merged_branches_ids
     //     .iter()
     //     .filter(|id|
-    //         ngit_path.join(format!("merges/{}.json",id)).exists()
+    //         gnostr_path.join(format!("merges/{}.json",id)).exists()
     //     )
     //     .collect();
     // // TODO: identify new PullRequests to report

@@ -32,7 +32,7 @@ pub fn merge(_sub_command_args: &MergeSubCommand) {
     let repo_dir_path = current_dir().unwrap();
 
     let git_repo = git2::Repository::open(&repo_dir_path)
-        .expect("git repo not initialized. run ngit init first");
+        .expect("git repo not initialized. run gnostr-cli init first");
 
     let repo = Repo::open(&repo_dir_path);
 
@@ -83,7 +83,7 @@ pub fn merge(_sub_command_args: &MergeSubCommand) {
 
 
     let branch_tip_patch_path = repo_dir_path.join(
-        format!(".ngit/patches/{}.json",&commit_id)
+        format!(".gnostr/patches/{}.json",&commit_id)
     );
 
     if !branch_tip_patch_path.exists() {
@@ -105,7 +105,7 @@ pub fn merge(_sub_command_args: &MergeSubCommand) {
             .id.to_string(),
     );
     let merge_path = repo_dir_path.join(
-        format!(".ngit/merges/{}.json",&merge_event.id.to_string())
+        format!(".gnostr/merges/{}.json",&merge_event.id.to_string())
     );
     // save event so fetch_pull_push picks it up when runing get_branch_refs
     save_event(&merge_path, &merge_event)

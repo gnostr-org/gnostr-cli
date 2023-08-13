@@ -19,8 +19,8 @@ pub fn initialize_patch(
         tag_branch(branch),
         tag_into_event(tag_branch(branch)),
         tag_commit_message(message),
-        tag_hashtag("ngit-event"),
-        tag_hashtag("ngit-format-0.0.1"),
+        tag_hashtag("gnostr-event"),
+        tag_hashtag("gnostr-format-0.0.0"),
 ];
     for id in commit_ids {
         tags.push(tag_commit(id));

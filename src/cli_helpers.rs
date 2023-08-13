@@ -109,7 +109,7 @@ pub fn select_relays(cfg:&mut MyConfig, selected_defaults:&Vec<String>) -> Resul
     // offer to save as default config
     if relay_selection.ne(&cfg.default_relays) {
         if Confirm::with_theme(&ColorfulTheme::default())
-        .with_prompt("Save relays as ngit default?")
+        .with_prompt("Save relays as gnostr default?")
         .default(true)
         .interact()
         .unwrap() {

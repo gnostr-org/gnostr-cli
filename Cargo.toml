@@ -1,14 +1,14 @@
 [package]
-name = "ngit"
-version = "0.0.2"
+name = "gnostr-cli"
+version = "0.0.0"
 edition = "2021"
-description = "a proof of concept cli for a nostr based github alternative"
-authors = ["DanConwayDev <DanConwayDev@protonmail.com>"]
+description = "gnostr-cli: git/nostr git2 command line utility"
+authors = ["DanConwayDev <DanConwayDev@protonmail.com>", "admin@gnostr.org <admin@gnostr.org>"]
 readme = "README.md"
-homepage = "https://github.com/DanConwayDev/ngit-cli"
-repository = "https://github.com/DanConwayDev/ngit-cli"
+homepage = "https://github.com/gnostr-org/gnostr-cli"
+repository = "https://github.com/gnostr-org/gnostr-cli"
 license = "MIT"
-keywords = ["nostr", "git"]
+keywords = ["gnostr","nostr", "git"]
 categories = ["command-line-utilities","git"]
 
 [dependencies]

@@ -11,7 +11,7 @@ pub fn find_select_recent_repos(
     let mut repo_events: Vec<Event> = client.get_events_of(
         vec![
             Filter::new()
-                .hashtag("ngit-format-0.0.1")
+                .hashtag("gnostr-format-0.0.0")
                 .kind(
                     Kind::InitializeRepo.into_sdk_custom_kind(),
                 )
@@ -25,7 +25,7 @@ pub fn find_select_recent_repos(
     repo_events.dedup();
 
     if repo_events.is_empty() {
-        panic!("could not find any repositories. Create one with ngit init?")
+        panic!("could not find any repositories. Create one with gnostr-cli init?")
     }
 
     let repos: Vec<Repo> = repo_events.iter().map(|r|
