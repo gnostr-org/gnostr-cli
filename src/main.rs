@@ -53,7 +53,7 @@ enum Commands {
 }
 
 fn main() -> Result<()> {
-    println!("gnostr-cli prototype v0.0.0-alpha");
+    // println!("gnostr-cli v0.0.0");
     // Parse input
     let args: Cli = Cli::parse();
 
