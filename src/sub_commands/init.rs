@@ -4,6 +4,8 @@ use clap::{Args};
 use indicatif::ProgressBar;
 use nostr_sdk::prelude::*;
 
+use std::process::Command;
+
 use crate::{config::{load_config, save_conifg}, groups::{init::{InitializeGroup}, group::{Group}}, repos::{init::InitializeRepo, repo::Repo}, utils::{save_event, create_client, get_or_generate_keys}, cli_helpers::select_relays, repo_config::RepoConfig};
 
 #[derive(Args)]
@@ -33,13 +35,113 @@ pub fn create_and_broadcast_init(
     
     let mut cfg = load_config();
 
+    let gnostr_weeble =
+        if cfg!(target_os = "windows") {
+        Command::new("cmd")
+                .args(["/C", "gnostr-weeble"])
+                .output()
+                .expect("failed to execute process")
+        } else
+        if cfg!(target_os = "macos"){
+        Command::new("sh")
+                .arg("-c")
+                .arg("gnostr-weeble")
+                .output()
+                .expect("failed to execute process")
+        } else
+        if cfg!(target_os = "linux"){
+        Command::new("sh")
+                .arg("-c")
+                .arg("gnostr-weeble")
+                .output()
+                .expect("failed to execute process")
+        } else {
+        Command::new("sh")
+                .arg("-c")
+                .arg("gnostr-weeble")
+                .output()
+                .expect("failed to execute process")
+        };
+
+    let weeble = String::from_utf8(gnostr_weeble.stdout)
+    .map_err(|non_utf8| String::from_utf8_lossy(non_utf8.as_bytes()).into_owned())
+    .unwrap();
+    //println!("weeble={}", weeble);
+
+    let gnostr_wobble =
+        if cfg!(target_os = "windows") {
+        Command::new("cmd")
+                .args(["/C", "gnostr-wobble"])
+                .output()
+                .expect("failed to execute process")
+        } else
+        if cfg!(target_os = "macos"){
+        Command::new("sh")
+                .arg("-c")
+                .arg("gnostr-wobble")
+                .output()
+                .expect("failed to execute process")
+        } else
+        if cfg!(target_os = "linux"){
+        Command::new("sh")
+                .arg("-c")
+                .arg("gnostr-wobble")
+                .output()
+                .expect("failed to execute process")
+        } else {
+        Command::new("sh")
+                .arg("-c")
+                .arg("gnostr-wobble")
+                .output()
+                .expect("failed to execute process")
+        };
+
+    let wobble = String::from_utf8(gnostr_wobble.stdout)
+    .map_err(|non_utf8| String::from_utf8_lossy(non_utf8.as_bytes()).into_owned())
+    .unwrap();
+    //println!("wobble={}", wobble);
+
+    let gnostr_blockheight =
+        if cfg!(target_os = "windows") {
+        Command::new("cmd")
+                .args(["/C", "gnostr-blockheight"])
+                .output()
+                .expect("failed to execute process")
+        } else
+        if cfg!(target_os = "macos"){
+        Command::new("sh")
+                .arg("-c")
+                .arg("gnostr-blockheight")
+                .output()
+                .expect("failed to execute process")
+        } else
+        if cfg!(target_os = "linux"){
+        Command::new("sh")
+                .arg("-c")
+                .arg("gnostr-blockheight")
+                .output()
+                .expect("failed to execute process")
+        } else {
+        Command::new("sh")
+                .arg("-c")
+                .arg("gnostr-blockheight")
+                .output()
+                .expect("failed to execute process")
+        };
+
+    let blockheight = String::from_utf8(gnostr_blockheight.stdout)
+    .map_err(|non_utf8| String::from_utf8_lossy(non_utf8.as_bytes()).into_owned())
+    .unwrap();
+    //println!("blockheight={}", blockheight);
+
     let repo_dir_path = std::env::current_dir().unwrap();
-    
+
     // check for potential problems
     let ngit_path = repo_dir_path.clone().join(".gnostr");
+
     if ngit_path.is_dir() && (
         !Confirm::with_theme(&ColorfulTheme::default())
-            .with_prompt(".gnostr already initialized! Do you want overwrite it with a fresh repoisotry?")
+            .with_prompt(".gnostr already initialized! Do you want overwrite it with a fresh repository?")
             .default(false)
             .interact()
             .unwrap()
@@ -48,16 +150,121 @@ pub fn create_and_broadcast_init(
             .default(false)
             .interact()
             .unwrap()
-    ) { panic!("aborted as .gnostr repository already exists."); };
+    ) {
+            let _move_gnostr =
+                if cfg!(target_os = "windows") {
+                Command::new("cmd")
+                        .args(["/C", "echo %time%"])
+                        .output()
+                        .expect("failed to execute process")
+                } else
+                if cfg!(target_os = "macos"){
+                Command::new("sh")
+                        .arg("-c")
+                        .arg("mv .gnostr .gnostr-$(date +%s)")
+                        .output()
+                        .expect("failed to execute process")
+                } else
+                if cfg!(target_os = "linux"){
+                Command::new("sh")
+                        .arg("-c")
+                        .arg("mv .gnostr .gnostr-$(date +%s)")
+                        .output()
+                        .expect("failed to execute process")
+                } else {
+                Command::new("sh")
+                        .arg("-c")
+                        .arg("mv .gnostr .gnostr-$(date +%s)")
+                        .output()
+                        .expect("failed to execute process")
+                };
+
+
+        //panic!("aborted as .gnostr repository already exists.");
+
+    };
 
     let git_path = repo_dir_path.clone().join(".git");
-    if git_path.is_dir() && (
-        !Confirm::with_theme(&ColorfulTheme::default())
-            .with_prompt("git has already been initialized here. For this alpha gnostr-cli prototype its best to start with a fresh repository. Continue anyway?")
+
+    if git_path.is_file() && (!Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt("a .git file indicates this may be a submodule. Continue anyway?")
             .default(false)
             .interact()
             .unwrap()
-    ) { panic!("aborted as git repository already initialized."); };
+    ) {
+            let _move_git =
+                if cfg!(target_os = "windows") {
+                Command::new("cmd")
+                        .args(["/C", "gnostr-blockheight"])
+                        .output()
+                        .expect("failed to execute process")
+                } else
+                if cfg!(target_os = "macos"){
+                Command::new("sh")
+                        .arg("-c")
+                        .arg("mv .git .git-$(date +%s)")
+                        .output()
+                        .expect("failed to execute process")
+                } else
+                if cfg!(target_os = "linux"){
+                Command::new("sh")
+                        .arg("-c")
+                        .arg("mv .git .git-$(date +%s)")
+                        .output()
+                        .expect("failed to execute process")
+                } else {
+                Command::new("sh")
+                        .arg("-c")
+                        .arg("mv .git .git-$(date +%s)")
+                        .output()
+                        .expect("failed to execute process")
+                };
+
+
+        //panic!("aborted as git repository already initialized.");
+
+    };
+
+    if git_path.is_dir() && (!Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt("git has already been initialized here. Continue anyway?")
+            .default(false)
+            .interact()
+            .unwrap()
+    ) {
+
+            let _move_git =
+                if cfg!(target_os = "windows") {
+                Command::new("cmd")
+                        .args(["/C", "gnostr-blockheight"])
+                        .output()
+                        .expect("failed to execute process")
+                } else
+                if cfg!(target_os = "macos"){
+                Command::new("sh")
+                        .arg("-c")
+                        .arg("mv .git .git-$(date +%s)")
+                        .output()
+                        .expect("failed to execute process")
+                } else
+                if cfg!(target_os = "linux"){
+                Command::new("sh")
+                        .arg("-c")
+                        .arg("mv .git .git-$(date +%s)")
+                        .output()
+                        .expect("failed to execute process")
+                } else {
+                Command::new("sh")
+                        .arg("-c")
+                        .arg("mv .git .git-$(date +%s)")
+                        .output()
+                        .expect("failed to execute process")
+                };
+
+
+
+        //panic!("aborted as git repository already initialized.");
+
+    };
 
     // collect information from user
 
@@ -71,7 +278,7 @@ pub fn create_and_broadcast_init(
                 .interact_text()
                 .unwrap()
         },
-    };    
+    };
     let repo_relays = select_relays(&mut cfg, &relays)?;
 
     let mut repo_group_members: Vec<String> = vec![];
