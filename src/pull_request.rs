@@ -5,7 +5,7 @@ use crate::{ngit_tag::{tag_repo, tag_branch, tag_branch_merge_from, tag_hashtag,
 
 pub fn initialize_pull_request(
     keys: &Keys,
-    repoistory:&String,
+    repository:&String,
     to_branch_id: &String,
     from_branch_id: &String,
     title: &String,
@@ -14,8 +14,8 @@ pub fn initialize_pull_request(
 
 ) -> Event {
     let mut tags = vec![
-        tag_repo(repoistory),
-        tag_into_event(tag_repo(repoistory)),
+        tag_repo(repository),
+        tag_into_event(tag_repo(repository)),
         tag_branch(to_branch_id),
         tag_into_event(tag_branch(to_branch_id)),
         tag_branch_merge_from(from_branch_id),

@@ -33,9 +33,9 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Initialize a repoistory
+    /// Initialize a repository
     Clone(sub_commands::clone::CloneSubCommand),
-    /// Initialize a repoistory
+    /// Initialize a repository
     Init(sub_commands::init::InitSubCommand),
     /// Pull to events and relays
     Pull(sub_commands::pull::PullSubCommand),

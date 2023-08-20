@@ -5,15 +5,15 @@ use crate::{ngit_tag::{tag_repo, tag_branch, tag_commit, tag_branch_merge_from, 
 
 pub fn initialize_merge(
     keys: &Keys,
-    repoistory:&String,
+    repository:&String,
     to_branch_id: &String,
     from_branch_id: &String,
     commit_id: &String,
     patch_id: &String,
 ) -> Event {
     let tags = vec![
-        tag_repo(repoistory),
-        tag_into_event(tag_repo(repoistory)),
+        tag_repo(repository),
+        tag_into_event(tag_repo(repository)),
         tag_branch(to_branch_id),
         tag_into_event(tag_branch(to_branch_id)),
         tag_branch_merge_from(from_branch_id),
