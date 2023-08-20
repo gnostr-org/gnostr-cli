@@ -5,7 +5,7 @@ use crate::{ngit_tag::{tag_repo, tag_branch, tag_commit_parent, tag_commit, tag_
 
 pub fn initialize_patch(
     keys: &Keys,
-    repoistory:&String,
+    repository:&String,
     branch: &String,
     patch:&[u8],
     message: &String,
@@ -14,8 +14,8 @@ pub fn initialize_patch(
     parent_commit_id:Option<String>,
 ) -> Event {
     let mut tags = vec![
-        tag_repo(repoistory),
-        tag_into_event(tag_repo(repoistory)),
+        tag_repo(repository),
+        tag_into_event(tag_repo(repository)),
         tag_branch(branch),
         tag_into_event(tag_branch(branch)),
         tag_commit_message(message),
