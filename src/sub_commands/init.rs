@@ -186,8 +186,14 @@ pub fn create_and_broadcast_init(
 
     let git_path = repo_dir_path.clone().join(".git");
 
-    if git_path.is_file() && (!Confirm::with_theme(&ColorfulTheme::default())
+    if git_path.is_file() && (
+        !Confirm::with_theme(&ColorfulTheme::default())
             .with_prompt("a .git file indicates this may be a submodule. Continue anyway?")
+            .default(false)
+            .interact()
+            .unwrap()
+        || !Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt("Are you sure?")
             .default(false)
             .interact()
             .unwrap()
@@ -202,20 +208,20 @@ pub fn create_and_broadcast_init(
                 if cfg!(target_os = "macos"){
                 Command::new("sh")
                         .arg("-c")
-                        .arg("mv .git .git-$(date +%s)")
+                        .arg("mv -rf .git .git-$(date +%s)")
                         .output()
                         .expect("failed to execute process")
                 } else
                 if cfg!(target_os = "linux"){
                 Command::new("sh")
                         .arg("-c")
-                        .arg("mv .git .git-$(date +%s)")
+                        .arg("mv -rf .git .git-$(date +%s)")
                         .output()
                         .expect("failed to execute process")
                 } else {
                 Command::new("sh")
                         .arg("-c")
-                        .arg("mv .git .git-$(date +%s)")
+                        .arg("mv -rf .git .git-$(date +%s)")
                         .output()
                         .expect("failed to execute process")
                 };
@@ -225,8 +231,14 @@ pub fn create_and_broadcast_init(
 
     };
 
-    if git_path.is_dir() && (!Confirm::with_theme(&ColorfulTheme::default())
+    if git_path.is_dir() && (
+        !Confirm::with_theme(&ColorfulTheme::default())
             .with_prompt("git has already been initialized here. Continue anyway?")
+            .default(false)
+            .interact()
+            .unwrap()
+        || !Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt("Are you sure?")
             .default(false)
             .interact()
             .unwrap()
@@ -242,20 +254,20 @@ pub fn create_and_broadcast_init(
                 if cfg!(target_os = "macos"){
                 Command::new("sh")
                         .arg("-c")
-                        .arg("mv .git .git-$(date +%s)")
+                        .arg("mv -rf .git .git-$(date +%s)")
                         .output()
                         .expect("failed to execute process")
                 } else
                 if cfg!(target_os = "linux"){
                 Command::new("sh")
                         .arg("-c")
-                        .arg("mv .git .git-$(date +%s)")
+                        .arg("mv -rf .git .git-$(date +%s)")
                         .output()
                         .expect("failed to execute process")
                 } else {
                 Command::new("sh")
                         .arg("-c")
-                        .arg("mv .git .git-$(date +%s)")
+                        .arg("mv -rf .git .git-$(date +%s)")
                         .output()
                         .expect("failed to execute process")
                 };
@@ -395,8 +407,28 @@ pub fn create_and_broadcast_init(
     }
     repo_config.set_last_branch_ref_update_time(new_repo.events[0].created_at.clone());
 
+
+
+
+
+
+
+
+
+
+
     // initialise git
     git2::Repository::init(repo_dir_path.clone()).unwrap();
+
+
+
+
+
+
+
+
+
+
 
     // add .gitignore
     let gitignore_path = repo_dir_path.join(".gitignore");
@@ -412,6 +444,13 @@ pub fn create_and_broadcast_init(
     };
     writeln!(gitignore_file, ".gnostr")
         .expect(".gnostr added to gitignore");
+
+
+
+
+
+
+
 
     let spinner = ProgressBar::new_spinner();
     spinner.set_message("Broadcasting... if this takes 20s+, there was a problem broadcasting to one or more relays even if it says 'Repository Initialised'.");
