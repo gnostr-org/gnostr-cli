@@ -5,6 +5,7 @@ cargo:## 	cargo  commands
 cargo-build:#####	cargo-build
 ##make cargo-build && ./target/debug/gnostr-sha256 gr README.md
 ##make cargo-build && ./target/debug/gnostr-sha256
+	@type -P rustup && rustup default nightly
 	@. $(HOME)/.cargo/env
 	@echo cargo b
 	@cargo b
@@ -35,6 +36,11 @@ cargo-build-release:#####	cargo-build-release
 	@. $(HOME)/.cargo/env>/tmp/gnostr-sha256.log
 	#@echo cargo b --release
 	@cargo b --release
+cargo-publish:#####	cargo-publish
+	@type -P rustup && rustup default nightly
+	@. $(HOME)/.cargo/env
+	@echo cargo publish
+	@cargo publish
 
 # vim: set noexpandtab:
 # vim: set setfiletype make
