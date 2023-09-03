@@ -33,7 +33,8 @@ cargo-test:#####	cargo-test
 cargo-build-release:#####	cargo-build-release
 ##make cargo-build-release && ./target/release/gnostr-sha256 gr README.md
 ##make cargo-build-release && ./target/release/gnostr-sha256
-	@. $(HOME)/.cargo/env>/tmp/gnostr-sha256.log
+	@type -P rustup && rustup default nightly
+	@. $(HOME)/.cargo/env>/tmp/gnostr-cli.log
 	#@echo cargo b --release
 	@cargo b --release
 cargo-publish:#####	cargo-publish
