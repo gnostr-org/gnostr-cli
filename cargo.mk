@@ -9,9 +9,8 @@ cargo-build:#####	cargo-build
 	@. $(HOME)/.cargo/env
 	@echo cargo b
 	@cargo b
+cargo-i:cargo-install#####	cargo-i
 cargo-install:#####	cargo-install
-	@. $(HOME)/.cargo/env>/tmp/gnostr-command.log
-#@echo cargo install --path $(PWD)
 	@cargo install --path $(PWD)
 #@echo "export PATH=$(CARGO_PATH)/bin:$(PATH)"
 cargo-check:#####	cargo-check
@@ -30,18 +29,27 @@ cargo-test:#####	cargo-test
 	@. $(HOME)/.cargo/env
 	@echo cargo test
 	@cargo test
+cargo-b-release:cargo-build-release#####	cargo-b-release
 cargo-build-release:#####	cargo-build-release
 ##make cargo-build-release && ./target/release/gnostr-sha256 gr README.md
 ##make cargo-build-release && ./target/release/gnostr-sha256
-	@type -P rustup && rustup default nightly
-	@. $(HOME)/.cargo/env>/tmp/gnostr-cli.log
-	#@echo cargo b --release
-	@cargo b --release
+	type -P rustup && rustup default nightly
+	cargo b --release
 cargo-publish:#####	cargo-publish
 	@type -P rustup && rustup default nightly
 	@. $(HOME)/.cargo/env
 	@echo cargo publish
 	@cargo publish
+
+rustup-install:rustup-install-stable## 	rustup-install
+rustup-install-stable:## 	rustup-install-stable
+##	install rustup sequence
+	$(shell echo which rustup) || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain stable --profile default && . "$(HOME)/.cargo/env"
+	$(shell echo which rustup) && rustup default stable
+rustup-install-nightly:## 	rustup-install-nightly
+##	install rustup sequence
+	$(shell echo which rustup) || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain nightly --profile default && . "$(HOME)/.cargo/env"
+	$(shell echo which rustup) && rustup default nightly
 
 # vim: set noexpandtab:
 # vim: set setfiletype make
