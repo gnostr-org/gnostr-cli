@@ -1,48 +1,24 @@
 [package]
-name = "ngit"
-version = "0.1.2"
+name = "gnostr-cli"
+version = "0.0.4"
 edition = "2021"
-description = "cli for code collaboration over nostr"
-authors = ["DanConwayDev <DanConwayDev@protonmail.com>"]
+description = "gnostr-cli: git/nostr git2 command line utility"
+authors = ["DanConwayDev <DanConwayDev@protonmail.com>", "admin@gnostr.org <admin@gnostr.org>"]
 readme = "README.md"
-homepage = "https://github.com/DanConwayDev/ngit-cli"
-repository = "https://github.com/DanConwayDev/ngit-cli"
+homepage = "https://github.com/gnostr-org/gnostr-cli"
+repository = "https://github.com/gnostr-org/gnostr-cli"
 license = "MIT"
-keywords = ["nostr", "git"]
+keywords = ["gnostr","nostr", "git"]
 categories = ["command-line-utilities","git"]
 
 [dependencies]
-anyhow = "1.0.75"
-async-trait = "0.1.73"
-chacha20poly1305 = "0.10.1"
-clap = { version = "4.3.19", features = ["derive"] }
-console = "0.15.7"
+clap = { version = "4.1.6", features = ["derive"] }
+nostr = { version = "0.22" }
+nostr-sdk = { version = "0.22", features = ["blocking"] }
+serde = { version = "1.0.147", features = ["derive"] }
+serde_json = "1.0.91"
 dialoguer = "0.10.4"
-directories = "5.0.1"
-futures = "0.3.28"
-git2 = "0.18.1"
-indicatif = "0.17.7"
-keyring = "2.0.5"
-nostr = "0.27.0"
-nostr-sdk = "0.27.0"
-passwords = "3.1.13"
-scrypt = "0.11.0"
-serde = { version = "1.0.181", features = ["derive"] }
-serde_json = "1.0.105"
-serde_yaml = "0.9.27"
-tokio = "1.33.0"
-zeroize = "1.6.0"
-
-[dev-dependencies]
-assert_cmd = "2.0.12"
-duplicate = "1.0.0"
-mockall = "0.11.4"
-once_cell = "1.18.0"
-rexpect = "0.5.0"
-serial_test = "2.0.0"
-test_utils = { path = "test_utils" }
-
-[workspace]
-members = [
-    "test_utils",
-]
+indicatif = "0.17.3"
+thiserror = "1.0"
+confy = "0.5.1"
+git2 = "0.17.1"
