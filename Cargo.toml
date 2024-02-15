@@ -11,6 +11,10 @@ license = "MIT"
 keywords = ["gnostr","nostr", "git"]
 categories = ["command-line-utilities","git"]
 
+[lib]
+name = "gnostr_cli"
+path = "src/lib.rs"
+
 [dependencies]
 anyhow = "1.0.75"
 async-trait = "0.1.73"
