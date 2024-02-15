@@ -1,6 +1,6 @@
 [package]
 name = "gnostr-cli"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2021"
 description = "gnostr-cli: git/nostr git2 command line utility"
 authors = ["DanConwayDev <DanConwayDev@protonmail.com>", "admin@gnostr.org <admin@gnostr.org>"]
