@@ -7,3 +7,6 @@ target.ngit
 .gnostr
 target/**
 .gnostr
+
+
+**.DS_Store
