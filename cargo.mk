@@ -30,6 +30,7 @@ cargo-test:#####	cargo-test
 	@echo cargo test
 	@cargo test
 cargo-b-release:cargo-build-release#####	cargo-b-release
+cargo-br:cargo-build-release #####	cargo-br
 cargo-build-release:#####	cargo-build-release
 ##make cargo-build-release && ./target/release/gnostr-sha256 gr README.md
 ##make cargo-build-release && ./target/release/gnostr-sha256
