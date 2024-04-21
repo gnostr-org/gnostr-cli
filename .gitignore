@@ -4,3 +4,10 @@ tmpgit-*
 test-utils/tmpgit-*
 tmp
 test-cli-expect-output.txt
+.ngit
+target.ngit
+.ngit
+.ngit
+.gnostr
+target/**
+.gnostr
