@@ -32,18 +32,18 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// save encrypted nsec for future use
-    Login(sub_commands::login::SubCommandArgs),
-    /// issue repository reference event as a maintainers
+    /// signal you are this repo's maintainer accepting proposals via nostr
     Init(sub_commands::init::SubCommandArgs),
-    /// send a PR / patch / patch set via nostr events
+    /// issue commits as a proposal
     Send(sub_commands::send::SubCommandArgs),
-    /// list open PRs / patches / patch sets and pull / apply them a branch
-    List(sub_commands::list::SubCommandArgs),
-    /// pull latest commits in pr linked to checked out branch
+    /// list proposals; checkout, apply or download selected
+    List,
+    /// send proposal revision
+    Push(sub_commands::push::SubCommandArgs),
+    /// fetch and apply new proposal commits / revisions linked to branch
     Pull,
-    /// push commits to current checked out pr branch
-    Push,
+    /// run with --nsec flag to change npub
+    Login(sub_commands::login::SubCommandArgs),
 }
 
 #[tokio::main]
@@ -53,8 +53,8 @@ async fn main() -> Result<()> {
         Commands::Login(args) => sub_commands::login::launch(&cli, args).await,
         Commands::Init(args) => sub_commands::init::launch(&cli, args).await,
         Commands::Send(args) => sub_commands::send::launch(&cli, args).await,
-        Commands::List(args) => sub_commands::list::launch(&cli, args).await,
+        Commands::List => sub_commands::list::launch().await,
         Commands::Pull => sub_commands::pull::launch().await,
-        Commands::Push => sub_commands::push::launch(&cli).await,
+        Commands::Push(args) => sub_commands::push::launch(&cli, args).await,
     }
 }

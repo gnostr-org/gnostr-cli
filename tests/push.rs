@@ -7,33 +7,33 @@ static FEATURE_BRANCH_NAME_1: &str = "feature-example-t";
 static FEATURE_BRANCH_NAME_2: &str = "feature-example-f";
 static FEATURE_BRANCH_NAME_3: &str = "feature-example-c";
 
-static PR_TITLE_1: &str = "pr a";
-static PR_TITLE_2: &str = "pr b";
-static PR_TITLE_3: &str = "pr c";
+static PROPOSAL_TITLE_1: &str = "proposal a";
+static PROPOSAL_TITLE_2: &str = "proposal b";
+static PROPOSAL_TITLE_3: &str = "proposal c";
 
-fn cli_tester_create_prs() -> Result<GitTestRepo> {
+fn cli_tester_create_proposals() -> Result<GitTestRepo> {
     let git_repo = GitTestRepo::default();
     git_repo.populate()?;
-    cli_tester_create_pr(
+    cli_tester_create_proposal(
         &git_repo,
         FEATURE_BRANCH_NAME_1,
         "a",
-        PR_TITLE_1,
-        "pr a description",
+        PROPOSAL_TITLE_1,
+        "proposal a description",
     )?;
-    cli_tester_create_pr(
+    cli_tester_create_proposal(
         &git_repo,
         FEATURE_BRANCH_NAME_2,
         "b",
-        PR_TITLE_2,
-        "pr b description",
+        PROPOSAL_TITLE_2,
+        "proposal b description",
     )?;
-    cli_tester_create_pr(
+    cli_tester_create_proposal(
         &git_repo,
         FEATURE_BRANCH_NAME_3,
         "c",
-        PR_TITLE_3,
-        "pr c description",
+        PROPOSAL_TITLE_3,
+        "proposal c description",
     )?;
     Ok(git_repo)
 }
@@ -62,7 +62,7 @@ fn create_and_populate_branch(
     Ok(())
 }
 
-fn cli_tester_create_pr(
+fn cli_tester_create_proposal(
     test_repo: &GitTestRepo,
     branch_name: &str,
     prefix: &str,
@@ -80,6 +80,7 @@ fn cli_tester_create_pr(
             TEST_PASSWORD,
             "--disable-cli-spinners",
             "send",
+            "HEAD~2",
             "--title",
             format!("\"{title}\"").as_str(),
             "--description",
@@ -100,19 +101,22 @@ mod when_main_is_checked_out {
         create_and_populate_branch(&test_repo, FEATURE_BRANCH_NAME_1, "a", false)?;
         test_repo.checkout("main")?;
         let mut p = CliTester::new_from_dir(&test_repo.dir, ["push"]);
-        p.expect("Error: checkout a branch associated with a PR first\r\n")?;
+        p.expect("Error: checkout a branch associated with a proposal first\r\n")?;
         p.expect_end()?;
         Ok(())
     }
 }
 
-mod when_pr_isnt_associated_with_branch_name {
+mod when_proposal_isnt_associated_with_branch_name {
     use super::*;
 
     mod cli_prompts {
 
         use super::*;
-        async fn run_async_cli_show_error() -> Result<()> {
+
+        #[tokio::test]
+        #[serial]
+        async fn cli_show_error() -> Result<()> {
             let (mut r51, mut r52, mut r53, mut r55, mut r56) = (
                 Relay::new(8051, None, None),
                 Relay::new(8052, None, None),
@@ -130,7 +134,7 @@ mod when_pr_isnt_associated_with_branch_name {
             r55.events.push(generate_test_key_1_relay_list_event());
 
             let cli_tester_handle = std::thread::spawn(move || -> Result<()> {
-                cli_tester_create_prs()?;
+                cli_tester_create_proposals()?;
 
                 let test_repo = GitTestRepo::default();
                 test_repo.populate()?;
@@ -139,9 +143,9 @@ mod when_pr_isnt_associated_with_branch_name {
                 test_repo.checkout("random-name")?;
 
                 let mut p = CliTester::new_from_dir(&test_repo.dir, ["push"]);
-                p.expect("finding PR event...\r\n")?;
+                p.expect("finding proposal root event...\r\n")?;
                 p.expect(
-                    "Error: cannot find a PR event associated with the checked out branch name\r\n",
+                    "Error: cannot find a proposal root event associated with the checked out branch name\r\n",
                 )?;
 
                 p.expect_end()?;
@@ -163,12 +167,6 @@ mod when_pr_isnt_associated_with_branch_name {
             cli_tester_handle.join().unwrap()?;
             Ok(())
         }
-
-        #[tokio::test]
-        #[serial]
-        async fn cli_show_error() -> Result<()> {
-            run_async_cli_show_error().await
-        }
     }
 }
 
@@ -180,7 +178,9 @@ mod when_branch_is_checked_out {
 
         mod cli_prompts {
             use super::*;
-            async fn run_async_cli_show_up_to_date() -> Result<()> {
+            #[tokio::test]
+            #[serial]
+            async fn cli_show_up_to_date() -> Result<()> {
                 let (mut r51, mut r52, mut r53, mut r55, mut r56) = (
                     Relay::new(8051, None, None),
                     Relay::new(8052, None, None),
@@ -198,7 +198,7 @@ mod when_branch_is_checked_out {
                 r55.events.push(generate_test_key_1_relay_list_event());
 
                 let cli_tester_handle = std::thread::spawn(move || -> Result<()> {
-                    cli_tester_create_prs()?;
+                    cli_tester_create_proposals()?;
 
                     let test_repo = GitTestRepo::default();
                     test_repo.populate()?;
@@ -206,9 +206,9 @@ mod when_branch_is_checked_out {
                     create_and_populate_branch(&test_repo, FEATURE_BRANCH_NAME_1, "a", false)?;
 
                     let mut p = CliTester::new_from_dir(&test_repo.dir, ["push"]);
-                    p.expect("finding PR event...\r\n")?;
-                    p.expect("found PR event. finding commits...\r\n")?;
-                    p.expect("Error: nostr pr already up-to-date with local branch\r\n")?;
+                    p.expect("finding proposal root event...\r\n")?;
+                    p.expect("found proposal root event. finding commits...\r\n")?;
+                    p.expect("Error: proposal already up-to-date with local branch\r\n")?;
                     p.expect_end()?;
 
                     for p in [51, 52, 53, 55, 56] {
@@ -226,13 +226,6 @@ mod when_branch_is_checked_out {
                     r56.listen_until_close(),
                 );
                 cli_tester_handle.join().unwrap()?;
-                Ok(())
-            }
-
-            #[tokio::test]
-            #[serial]
-            async fn cli_show_up_to_date() -> Result<()> {
-                let _ = run_async_cli_show_up_to_date().await;
                 Ok(())
             }
         }
@@ -243,7 +236,10 @@ mod when_branch_is_checked_out {
 
         mod cli_prompts {
             use super::*;
-            async fn run_async_cli_show_up_to_date() -> Result<()> {
+
+            #[tokio::test]
+            #[serial]
+            async fn cli_show_proposal_ahead_error() -> Result<()> {
                 let (mut r51, mut r52, mut r53, mut r55, mut r56) = (
                     Relay::new(8051, None, None),
                     Relay::new(8052, None, None),
@@ -261,7 +257,7 @@ mod when_branch_is_checked_out {
                 r55.events.push(generate_test_key_1_relay_list_event());
 
                 let cli_tester_handle = std::thread::spawn(move || -> Result<()> {
-                    cli_tester_create_prs()?;
+                    cli_tester_create_proposals()?;
 
                     let test_repo = GitTestRepo::default();
                     test_repo.populate()?;
@@ -269,9 +265,9 @@ mod when_branch_is_checked_out {
                     create_and_populate_branch(&test_repo, FEATURE_BRANCH_NAME_1, "a", true)?;
 
                     let mut p = CliTester::new_from_dir(&test_repo.dir, ["push"]);
-                    p.expect("finding PR event...\r\n")?;
-                    p.expect("found PR event. finding commits...\r\n")?;
-                    p.expect("Error: nostr pr is ahead of local branch\r\n")?;
+                    p.expect("finding proposal root event...\r\n")?;
+                    p.expect("found proposal root event. finding commits...\r\n")?;
+                    p.expect("Error: proposal is ahead of local branch\r\n")?;
                     p.expect_end()?;
 
                     for p in [51, 52, 53, 55, 56] {
@@ -289,13 +285,6 @@ mod when_branch_is_checked_out {
                     r56.listen_until_close(),
                 );
                 cli_tester_handle.join().unwrap()?;
-                Ok(())
-            }
-
-            #[tokio::test]
-            #[serial]
-            async fn cli_show_up_to_date() -> Result<()> {
-                let _ = run_async_cli_show_up_to_date().await;
                 Ok(())
             }
         }
@@ -309,7 +298,9 @@ mod when_branch_is_checked_out {
 
             use super::*;
 
-            async fn run_async_cli_applied_1_commit() -> Result<()> {
+            #[tokio::test]
+            #[serial]
+            async fn cli_applied_1_commit() -> Result<()> {
                 // fallback (51,52) user write (53, 55) repo (55, 56)
                 let (mut r51, mut r52, mut r53, mut r55, mut r56) = (
                     Relay::new(8051, None, None),
@@ -329,7 +320,7 @@ mod when_branch_is_checked_out {
 
                 let cli_tester_handle =
                     std::thread::spawn(move || -> Result<(GitTestRepo, GitTestRepo)> {
-                        let originating_repo = cli_tester_create_prs()?;
+                        let originating_repo = cli_tester_create_proposals()?;
 
                         let test_repo = GitTestRepo::default();
                         test_repo.populate()?;
@@ -350,8 +341,8 @@ mod when_branch_is_checked_out {
                                 "push",
                             ],
                         );
-                        p.expect("finding PR event...\r\n")?;
-                        p.expect("found PR event. finding commits...\r\n")?;
+                        p.expect("finding proposal root event...\r\n")?;
+                        p.expect("found proposal root event. finding commits...\r\n")?;
                         p.expect(
                             "1 commits ahead. preparing to create creating patch events.\r\n",
                         )?;
@@ -392,13 +383,6 @@ mod when_branch_is_checked_out {
 
                 Ok(())
             }
-
-            #[tokio::test]
-            #[serial]
-            async fn cli_applied_1_commit() -> Result<()> {
-                let _ = run_async_cli_applied_1_commit().await;
-                Ok(())
-            }
         }
 
         async fn prep_and_run() -> Result<(GitTestRepo, Vec<nostr::Event>)> {
@@ -420,7 +404,7 @@ mod when_branch_is_checked_out {
             r55.events.push(generate_test_key_1_relay_list_event());
 
             let cli_tester_handle = std::thread::spawn(move || -> Result<GitTestRepo> {
-                cli_tester_create_prs()?;
+                cli_tester_create_proposals()?;
 
                 let test_repo = GitTestRepo::default();
                 test_repo.populate()?;
@@ -476,7 +460,176 @@ mod when_branch_is_checked_out {
     }
 
     mod when_branch_has_been_rebased {
-        // use super::*;
-        // TODO
+        use super::*;
+
+        mod cli_prompts {
+            use super::*;
+
+            #[tokio::test]
+            #[serial]
+            async fn cli_shows_unpublished_rebase_error() -> Result<()> {
+                let (mut r51, mut r52, mut r53, mut r55, mut r56) = (
+                    Relay::new(8051, None, None),
+                    Relay::new(8052, None, None),
+                    Relay::new(8053, None, None),
+                    Relay::new(8055, None, None),
+                    Relay::new(8056, None, None),
+                );
+
+                r51.events.push(generate_test_key_1_relay_list_event());
+                r51.events.push(generate_test_key_1_metadata_event("fred"));
+                r51.events.push(generate_repo_ref_event());
+
+                r55.events.push(generate_repo_ref_event());
+                r55.events.push(generate_test_key_1_metadata_event("fred"));
+                r55.events.push(generate_test_key_1_relay_list_event());
+
+                let cli_tester_handle = std::thread::spawn(move || -> Result<()> {
+                    cli_tester_create_proposals()?;
+
+                    let test_repo = GitTestRepo::default();
+                    test_repo.populate()?;
+
+                    // simulate rebase
+                    std::fs::write(test_repo.dir.join("amazing.md"), "some content")?;
+                    test_repo.stage_and_commit("commit for rebasing on top of")?;
+                    create_and_populate_branch(&test_repo, FEATURE_BRANCH_NAME_1, "a", true)?;
+
+                    let mut p = CliTester::new_from_dir(&test_repo.dir, ["push"]);
+                    // p.expect_end_eventually_and_print()?;
+
+                    p.expect("finding proposal root event...\r\n")?;
+                    p.expect("found proposal root event. finding commits...\r\n")?;
+                    p.expect("Error: local unpublished proposal has been rebased. consider force pushing\r\n")?;
+                    p.expect_end()?;
+
+                    for p in [51, 52, 53, 55, 56] {
+                        relay::shutdown_relay(8000 + p)?;
+                    }
+                    Ok(())
+                });
+
+                // launch relay
+                let _ = join!(
+                    r51.listen_until_close(),
+                    r52.listen_until_close(),
+                    r53.listen_until_close(),
+                    r55.listen_until_close(),
+                    r56.listen_until_close(),
+                );
+                cli_tester_handle.join().unwrap()?;
+                Ok(())
+            }
+        }
+        mod with_force_flag {
+            use super::*;
+
+            mod cli_prompts {
+                use super::*;
+
+                #[tokio::test]
+                #[serial]
+                async fn cli_shows_revision_sent() -> Result<()> {
+                    let (mut r51, mut r52, mut r53, mut r55, mut r56) = (
+                        Relay::new(8051, None, None),
+                        Relay::new(8052, None, None),
+                        Relay::new(8053, None, None),
+                        Relay::new(8055, None, None),
+                        Relay::new(8056, None, None),
+                    );
+
+                    r51.events.push(generate_test_key_1_relay_list_event());
+                    r51.events.push(generate_test_key_1_metadata_event("fred"));
+                    r51.events.push(generate_repo_ref_event());
+
+                    r55.events.push(generate_repo_ref_event());
+                    r55.events.push(generate_test_key_1_metadata_event("fred"));
+                    r55.events.push(generate_test_key_1_relay_list_event());
+
+                    let cli_tester_handle = std::thread::spawn(move || -> Result<()> {
+                        cli_tester_create_proposals()?;
+
+                        let test_repo = GitTestRepo::default();
+                        test_repo.populate()?;
+
+                        // simulate rebase
+                        std::fs::write(test_repo.dir.join("amazing.md"), "some content")?;
+                        test_repo.stage_and_commit("commit for rebasing on top of")?;
+                        create_and_populate_branch(&test_repo, FEATURE_BRANCH_NAME_1, "a", false)?;
+                        let mut p = CliTester::new_from_dir(
+                            &test_repo.dir,
+                            [
+                                "--nsec",
+                                TEST_KEY_1_NSEC,
+                                "--password",
+                                TEST_PASSWORD,
+                                "--disable-cli-spinners",
+                                "push",
+                                "--force",
+                                "--no-cover-letter",
+                            ],
+                        );
+                        p.expect("finding proposal root event...\r\n")?;
+                        p.expect("found proposal root event. finding commits...\r\n")?;
+                        p.expect("preparing to force push proposal revision...\r\n")?;
+                        // standard output from `ngit send`
+                        p.expect("creating proposal revision for: ")?;
+                        // proposal id will be printed in this gap
+                        p.expect_eventually("\r\n")?;
+                        let mut selector = p.expect_multi_select(
+                            "select commits for proposal",
+                            vec![
+                                "(Joe Bloggs) add a4.md [feature-example-t] 355bdf1".to_string(),
+                                "(Joe Bloggs) add a3.md dbd1115".to_string(),
+                                "(Joe Bloggs) commit for rebasing on top of [main] 1aa2cfe"
+                                    .to_string(),
+                                "(Joe Bloggs) add t2.md 431b84e".to_string(),
+                                "(Joe Bloggs) add t1.md af474d8".to_string(),
+                                "(Joe Bloggs) Initial commit 9ee507f".to_string(),
+                            ],
+                        )?;
+                        selector.succeeds_with(vec![0, 1], false, vec![0, 1])?;
+                        p.expect("creating proposal from 2 commits:\r\n")?;
+                        p.expect("355bdf1 add a4.md\r\n")?;
+                        p.expect("dbd1115 add a3.md\r\n")?;
+                        p.expect("searching for profile and relay updates...\r\n")?;
+                        p.expect("\r")?;
+                        p.expect("logged in as fred\r\n")?;
+                        p.expect("posting 2 patches without a covering letter...\r\n")?;
+
+                        relay::expect_send_with_progress(
+                            &mut p,
+                            vec![
+                                (" [my-relay] [repo-relay] ws://localhost:8055", true, ""),
+                                (" [my-relay] ws://localhost:8053", true, ""),
+                                (" [repo-relay] ws://localhost:8056", true, ""),
+                                (" [default] ws://localhost:8051", true, ""),
+                                (" [default] ws://localhost:8052", true, ""),
+                            ],
+                            2,
+                        )?;
+                        // end standard `ngit send output`
+                        p.expect_after_whitespace("force pushed proposal revision\r\n")?;
+                        p.expect_end()?;
+
+                        for p in [51, 52, 53, 55, 56] {
+                            relay::shutdown_relay(8000 + p)?;
+                        }
+                        Ok(())
+                    });
+
+                    // launch relay
+                    let _ = join!(
+                        r51.listen_until_close(),
+                        r52.listen_until_close(),
+                        r53.listen_until_close(),
+                        r55.listen_until_close(),
+                        r56.listen_until_close(),
+                    );
+                    cli_tester_handle.join().unwrap()?;
+                    Ok(())
+                }
+            }
+        }
     }
 }

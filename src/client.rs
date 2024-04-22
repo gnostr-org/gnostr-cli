@@ -12,14 +12,14 @@
 // want to inadvertlty use other features of nightly that might be removed.
 use std::{fmt::Write, time::Duration};
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use async_trait::async_trait;
 use futures::stream::{self, StreamExt};
 use indicatif::{MultiProgress, ProgressBar, ProgressState, ProgressStyle};
 #[cfg(test)]
 use mockall::*;
 use nostr::Event;
-use nostr_sdk::ClientSigner;
+use nostr_sdk::NostrSigner;
 
 #[allow(clippy::struct_field_names)]
 pub struct Client {
@@ -101,7 +101,7 @@ impl Connect for Client {
 
     async fn set_keys(&mut self, keys: &nostr::Keys) {
         self.client
-            .set_signer(Some(ClientSigner::Keys(keys.clone())))
+            .set_signer(Some(NostrSigner::Keys(keys.clone())))
             .await;
     }
 
@@ -124,8 +124,9 @@ impl Connect for Client {
 
     async fn send_event_to(&self, url: &str, event: Event) -> Result<nostr::EventId> {
         self.client.add_relay(url).await?;
+        #[allow(clippy::large_futures)]
         self.client.connect_relay(url).await?;
-        Ok(self.client.send_event_to(url, event).await?)
+        Ok(self.client.send_event_to(vec![url], event).await?)
     }
 
     async fn get_events(
@@ -144,7 +145,7 @@ impl Connect for Client {
         let m = MultiProgress::new();
         let pb_style = ProgressStyle::with_template(" {spinner} {prefix} {msg} {timeout_in}")?
             .with_key("timeout_in", |state: &ProgressState, w: &mut dyn Write| {
-                if state.elapsed().as_secs() > 3 {
+                if state.elapsed().as_secs() > 3 && state.elapsed().as_secs() < GET_EVENTS_TIMEOUT {
                     write!(
                         w,
                         "timeout in {:.1}s",
@@ -200,6 +201,7 @@ impl Connect for Client {
                 } else {
                     None
                 };
+                #[allow(clippy::large_futures)]
                 match get_events_of(relay, filters, &pb).await {
                     Err(error) => {
                         if let Some(pb) = pb {
@@ -238,7 +240,8 @@ impl Connect for Client {
     }
 }
 
-static GET_EVENTS_TIMEOUT: u64 = 10;
+static CONNECTION_TIMEOUT: u64 = 3;
+static GET_EVENTS_TIMEOUT: u64 = 7;
 
 async fn get_events_of(
     relay: &nostr_sdk::Relay,
@@ -246,10 +249,15 @@ async fn get_events_of(
     pb: &Option<ProgressBar>,
 ) -> Result<Vec<Event>> {
     if !relay.is_connected().await {
-        relay.connect(None).await;
+        #[allow(clippy::large_futures)]
+        relay
+            .connect(Some(std::time::Duration::from_secs(CONNECTION_TIMEOUT)))
+            .await;
     }
 
-    if let Some(pb) = pb {
+    if !relay.is_connected().await {
+        bail!("connection timeout");
+    } else if let Some(pb) = pb {
         pb.set_prefix(format!("connected  {}", relay.url()));
     }
     let events = relay

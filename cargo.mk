@@ -34,10 +34,10 @@ cargo-br:cargo-build-release #####	cargo-br
 cargo-build-release:#####	cargo-build-release
 ##make cargo-build-release && ./target/release/gnostr-sha256 gr README.md
 ##make cargo-build-release && ./target/release/gnostr-sha256
-	type -P rustup && rustup default nightly
+	type -P rustup && rustup default stable
 	cargo b --release
 cargo-publish:#####	cargo-publish
-	@type -P rustup && rustup default nightly
+	@type -P rustup && rustup default stable
 	@. $(HOME)/.cargo/env
 	@echo cargo publish
 	@cargo publish

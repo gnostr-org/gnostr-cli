@@ -1,9 +1,9 @@
-use std::{ffi::OsStr, path::PathBuf};
+use std::{ffi::OsStr, path::PathBuf, str::FromStr};
 
-use anyhow::{ensure, Context, Result};
+use anyhow::{bail, ensure, Context, Result};
 use dialoguer::theme::{ColorfulTheme, Theme};
 use directories::ProjectDirs;
-use nostr::{self, prelude::FromSkStr, Kind, Tag};
+use nostr::{self, Kind, Tag};
 use once_cell::sync::Lazy;
 use rexpect::session::{Options, PtySession};
 use strip_ansi_escapes::strip_str;
@@ -26,7 +26,7 @@ pub static TEST_KEY_1_DISPLAY_NAME: &str = "bob";
 pub static TEST_KEY_1_ENCRYPTED: &str = "ncryptsec1qyq607h3cykxc3f2a44u89cdk336fptccn3fm5pf3nmf93d3c86qpunc7r6klwcn6lyszjy72wxwqq9aljg4pm6atvjrds9e248yhv76xfnt464265kgnjsvg8rlg06wg4sp9uljzfpu8zuaztcvfn2j8ggdrg8mldh850cy75efsyqqansert9wqmn4e6khpgvfz7h5le9";
 pub static TEST_KEY_1_ENCRYPTED_WEAK: &str = "ncryptsec1qy8ke0tjqnn8wt3w6lnc86c27ry3qrptxctjfcgruryxy0at238kwyjwsswd7z88thysruzw3awlrsxjvw5uptcd7vt70ft9rtkx00m8cgy3khm4hxa5d2gfnc6athnfruy2eyl6pkas8k34jg85z7xjqqadzfzh9rp0fzxqtw0tvxksac3n8yc98uksvuf93e0lcvqy8j6";
 pub static TEST_KEY_1_KEYS: Lazy<nostr::Keys> =
-    Lazy::new(|| nostr::Keys::from_sk_str(TEST_KEY_1_NSEC).unwrap());
+    Lazy::new(|| nostr::Keys::from_str(TEST_KEY_1_NSEC).unwrap());
 
 pub fn generate_test_key_1_metadata_event(name: &str) -> nostr::Event {
     nostr::event::EventBuilder::metadata(&nostr::Metadata::new().name(name))
@@ -95,7 +95,7 @@ pub static TEST_KEY_2_NPUB: &str =
 pub static TEST_KEY_2_DISPLAY_NAME: &str = "carole";
 pub static TEST_KEY_2_ENCRYPTED: &str = "...2";
 pub static TEST_KEY_2_KEYS: Lazy<nostr::Keys> =
-    Lazy::new(|| nostr::Keys::from_sk_str(TEST_KEY_2_NSEC).unwrap());
+    Lazy::new(|| nostr::Keys::from_str(TEST_KEY_2_NSEC).unwrap());
 
 pub fn generate_test_key_2_metadata_event(name: &str) -> nostr::Event {
     nostr::event::EventBuilder::metadata(&nostr::Metadata::new().name(name))
@@ -252,6 +252,20 @@ impl CliTester {
         choices: Vec<String>,
     ) -> Result<CliTesterChoicePrompt> {
         let mut i = CliTesterChoicePrompt {
+            tester: self,
+            prompt: prompt.to_string(),
+            choices,
+        };
+        i.prompt(false).context("initial confirm prompt")?;
+        Ok(i)
+    }
+
+    pub fn expect_multi_select(
+        &mut self,
+        prompt: &str,
+        choices: Vec<String>,
+    ) -> Result<CliTesterMultiSelectPrompt> {
+        let mut i = CliTesterMultiSelectPrompt {
             tester: self,
             prompt: prompt.to_string(),
             choices,
@@ -448,6 +462,75 @@ impl CliTesterConfirmPrompt<'_> {
     }
 }
 
+pub struct CliTesterMultiSelectPrompt<'a> {
+    tester: &'a mut CliTester,
+    prompt: String,
+    choices: Vec<String>,
+}
+
+impl CliTesterMultiSelectPrompt<'_> {
+    fn prompt(&mut self, eventually: bool) -> Result<&mut Self> {
+        if eventually {
+            self.tester
+                .expect_eventually(format!("{}:\r\n", self.prompt))
+                .context("expect multi-select prompt eventually")?;
+        } else {
+            self.tester
+                .expect(format!("{}:\r\n", self.prompt))
+                .context("expect multi-select prompt")?;
+        }
+        Ok(self)
+    }
+
+    pub fn succeeds_with(
+        &mut self,
+        chosen_indexes: Vec<usize>,
+        report: bool,
+        default_indexes: Vec<usize>,
+    ) -> Result<&mut Self> {
+        if report {
+            bail!("TODO: add support for report")
+        }
+
+        fn show_options(
+            tester: &mut CliTester,
+            choices: &[String],
+            active_index: usize,
+            selected_indexes: &[usize],
+        ) -> Result<()> {
+            for (index, item) in choices.iter().enumerate() {
+                tester.expect(format!(
+                    "{}{}{}\r\n",
+                    if active_index.eq(&index) { "> " } else { "  " },
+                    if selected_indexes.iter().any(|i| i.eq(&index)) {
+                        "[x] "
+                    } else {
+                        "[ ] "
+                    },
+                    item,
+                ))?;
+            }
+            Ok(())
+        }
+
+        show_options(self.tester, &self.choices, 0, &default_indexes)?;
+
+        if default_indexes.eq(&chosen_indexes) {
+            self.tester.send("\r\n")?;
+        } else {
+            bail!("TODO: add support changing options");
+        }
+
+        for _ in self.choices.iter() {
+            self.tester.expect("\r")?;
+        }
+        // one for removing prompt maybe?
+        self.tester.expect("\r")?;
+
+        Ok(self)
+    }
+}
+
 pub struct CliTesterChoicePrompt<'a> {
     tester: &'a mut CliTester,
     prompt: String,
@@ -479,10 +562,19 @@ impl CliTesterChoicePrompt<'_> {
         Ok(self)
     }
 
-    pub fn succeeds_with(&mut self, chosen_index: u64, report: bool) -> Result<&mut Self> {
+    pub fn succeeds_with(
+        &mut self,
+        chosen_index: u64,
+        report: bool,
+        default_index: Option<u64>,
+    ) -> Result<&mut Self> {
+        if default_index.is_some() {
+            println!("TODO: add support for default choice")
+        }
+
         fn show_options(
             tester: &mut CliTester,
-            choices: &Vec<String>,
+            choices: &[String],
             selected_index: Option<usize>,
         ) -> Result<()> {
             if selected_index.is_some() {
@@ -637,6 +729,22 @@ impl CliTester {
         }
     }
 
+    fn exp_string(&mut self, message: &str) -> Result<String> {
+        match self
+            .rexpect_session
+            .exp_string(message)
+            .context("expected immediate end but got timed out")
+        {
+            Ok(before) => Ok(before),
+            Err(e) => {
+                for p in [51, 52, 53, 55, 56, 57] {
+                    let _ = relay::shutdown_relay(8000 + p);
+                }
+                Err(e)
+            }
+        }
+    }
+
     /// returns what came before expected message
     pub fn expect_eventually<S>(&mut self, message: S) -> Result<String>
     where
@@ -644,10 +752,7 @@ impl CliTester {
     {
         let message_string = message.into();
         let message = message_string.as_str();
-        let before = self
-            .rexpect_session
-            .exp_string(message)
-            .context("exp_string failed")?;
+        let before = self.exp_string(message).context("exp_string failed")?;
         Ok(before)
     }
 
@@ -667,7 +772,7 @@ impl CliTester {
         let message = message_string.as_str();
         let before = self.expect_eventually(message)?;
         if !before.is_empty() {
-            std::fs::write("aaaaaaaaaaaa.txt", before.clone())?;
+            std::fs::write("test-cli-expect-output.txt", before.clone())?;
 
             // let mut output = std::fs::File::create("aaaaaaaaaaa.txt")?;
             // write!(output, "{}", *before);
@@ -683,9 +788,24 @@ impl CliTester {
         Ok(self)
     }
 
+    fn exp_eof(&mut self) -> Result<String> {
+        match self
+            .rexpect_session
+            .exp_eof()
+            .context("expected end but got timed out")
+        {
+            Ok(before) => Ok(before),
+            Err(e) => {
+                for p in [51, 52, 53, 55, 56, 57] {
+                    let _ = relay::shutdown_relay(8000 + p);
+                }
+                Err(e)
+            }
+        }
+    }
+
     pub fn expect_end(&mut self) -> Result<()> {
         let before = self
-            .rexpect_session
             .exp_eof()
             .context("expected immediate end but got timed out")?;
         ensure!(
@@ -700,7 +820,6 @@ impl CliTester {
 
     pub fn expect_end_with(&mut self, message: &str) -> Result<()> {
         let before = self
-            .rexpect_session
             .exp_eof()
             .context("expected immediate end but got timed out")?;
         assert_eq!(before, message);
@@ -708,10 +827,7 @@ impl CliTester {
     }
 
     pub fn expect_end_eventually_and_print(&mut self) -> Result<()> {
-        let before = self
-            .rexpect_session
-            .exp_eof()
-            .context("expected immediate end but got timed out")?;
+        let before = self.exp_eof().context("expected end but got timed out")?;
         println!("ended eventually with:");
         println!("{}", &before);
         Ok(())
@@ -719,7 +835,6 @@ impl CliTester {
 
     pub fn expect_end_with_whitespace(&mut self) -> Result<()> {
         let before = self
-            .rexpect_session
             .exp_eof()
             .context("expected immediate end but got timed out")?;
         assert_eq!(before.trim(), "");
@@ -727,8 +842,7 @@ impl CliTester {
     }
 
     pub fn expect_end_eventually(&mut self) -> Result<String> {
-        self.rexpect_session
-            .exp_eof()
+        self.exp_eof()
             .context("expected end eventually but got timed out")
     }
 

@@ -1,7 +1,7 @@
 use std::{fs::File, io::BufReader, str::FromStr};
 
 use anyhow::{bail, Context, Result};
-use nostr::{nips::nip19::Nip19, secp256k1::XOnlyPublicKey, FromBech32, Tag, ToBech32};
+use nostr::{nips::nip19::Nip19, FromBech32, PublicKey, Tag, ToBech32};
 use serde::{Deserialize, Serialize};
 
 #[cfg(not(test))]
@@ -20,10 +20,10 @@ pub struct RepoRef {
     pub description: String,
     pub identifier: String,
     pub root_commit: String,
-    pub git_server: String,
+    pub git_server: Vec<String>,
     pub web: Vec<String>,
     pub relays: Vec<String>,
-    pub maintainers: Vec<XOnlyPublicKey>,
+    pub maintainers: Vec<PublicKey>,
     // code languages and hashtags
 }
 
@@ -49,7 +49,8 @@ impl TryFrom<nostr::Event> for RepoRef {
         }
 
         if let Some(t) = event.tags.iter().find(|t| t.as_vec()[0].eq("clone")) {
-            r.git_server = t.as_vec()[1].clone();
+            r.git_server = t.as_vec().clone();
+            r.git_server.remove(0);
         }
 
         if let Some(t) = event.tags.iter().find(|t| t.as_vec()[0].eq("web")) {
@@ -78,7 +79,7 @@ impl TryFrom<nostr::Event> for RepoRef {
             }
             for pk in maintainers {
                 r.maintainers.push(
-                nostr_sdk::prelude::XOnlyPublicKey::from_str(&pk)
+                nostr_sdk::prelude::PublicKey::from_str(&pk)
                     .context(format!("cannot convert entry from maintainers tag {pk} into a valid nostr public key. it should be in hex format"))
                     .context("invalid repository event")?,
                 );
@@ -121,7 +122,7 @@ impl RepoRef {
                     Tag::Description(self.description.clone()),
                     Tag::Generic(
                         nostr::TagKind::Custom("clone".to_string()),
-                        vec![self.git_server.clone()],
+                        self.git_server.clone(),
                     ),
                     Tag::Generic(nostr::TagKind::Custom("web".to_string()), self.web.clone()),
                     Tag::Generic(
@@ -152,6 +153,7 @@ pub async fn fetch(
     #[cfg(not(test))] client: &Client,
     // TODO: more rubust way of finding repo events
     fallback_relays: Vec<String>,
+    prompt_for_nevent_if_cant_event: bool,
 ) -> Result<RepoRef> {
     let repo_config = get_repo_config_from_yaml(git_repo);
 
@@ -187,6 +189,9 @@ pub async fn fetch(
         {
             break event.clone();
         }
+        if !prompt_for_nevent_if_cant_event {
+            bail!("cannot find repo event");
+        }
         println!("cannot find repo event");
         loop {
             let bech32 = Interactor::default()
@@ -196,8 +201,9 @@ pub async fn fetch(
                     nostr::Filter::default().kind(nostr::Kind::Custom(REPO_REF_KIND));
                 match nip19 {
                     Nip19::Coordinate(c) => {
-                        repo_event_filter =
-                            repo_event_filter.identifier(c.identifier).author(c.pubkey);
+                        repo_event_filter = repo_event_filter
+                            .identifier(c.identifier)
+                            .author(c.public_key);
                         for r in c.relays {
                             relays.push(r);
                         }
@@ -242,11 +248,11 @@ pub fn get_repo_config_from_yaml(git_repo: &Repo) -> Result<RepoConfigYaml> {
     Ok(repo_config_yaml)
 }
 
-pub fn extract_pks(pk_strings: Vec<String>) -> Result<Vec<XOnlyPublicKey>> {
-    let mut pks: Vec<XOnlyPublicKey> = vec![];
+pub fn extract_pks(pk_strings: Vec<String>) -> Result<Vec<PublicKey>> {
+    let mut pks: Vec<PublicKey> = vec![];
     for s in pk_strings {
         pks.push(
-            nostr_sdk::prelude::XOnlyPublicKey::from_bech32(s.clone())
+            nostr_sdk::prelude::PublicKey::from_bech32(s.clone())
                 .context(format!("cannot convert {s} into a valid nostr public key"))?,
         );
     }
@@ -255,7 +261,7 @@ pub fn extract_pks(pk_strings: Vec<String>) -> Result<Vec<XOnlyPublicKey>> {
 
 pub fn save_repo_config_to_yaml(
     git_repo: &Repo,
-    maintainers: Vec<XOnlyPublicKey>,
+    maintainers: Vec<PublicKey>,
     relays: Vec<String>,
 ) -> Result<()> {
     let path = git_repo.get_path()?.join("maintainers.yaml");
@@ -298,7 +304,7 @@ mod tests {
             name: "test name".to_string(),
             description: "test description".to_string(),
             root_commit: "5e664e5a7845cd1373c79f580ca4fe29ab5b34d2".to_string(),
-            git_server: "https://localhost:1000".to_string(),
+            git_server: vec!["https://localhost:1000".to_string()],
             web: vec![
                 "https://exampleproject.xyz".to_string(),
                 "https://gitworkshop.dev/123".to_string(),
@@ -389,7 +395,7 @@ mod tests {
         fn git_server() {
             assert_eq!(
                 RepoRef::try_from(create()).unwrap().git_server,
-                "https://localhost:1000",
+                vec!["https://localhost:1000"],
             )
         }
 

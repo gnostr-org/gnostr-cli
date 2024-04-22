@@ -1,6 +1,6 @@
 [package]
 name = "gnostr-cli"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2021"
 description = "gnostr-cli: git/nostr git2 command line utility"
 authors = ["DanConwayDev <DanConwayDev@protonmail.com>", "admin@gnostr.org <admin@gnostr.org>"]
@@ -23,9 +23,10 @@ futures = "0.3.28"
 git2 = "0.18.1"
 indicatif = "0.17.7"
 keyring = "2.0.5"
-nostr = "0.27.0"
-nostr-sdk = "0.27.0"
+nostr = "0.29"
+nostr-sdk = "0.29"
 passwords = "3.1.13"
+proc-macro2 = "1.0.81"
 scrypt = "0.11.0"
 serde = { version = "1.0.181", features = ["derive"] }
 serde_json = "1.0.105"
@@ -42,7 +43,7 @@ rexpect = "0.5.0"
 serial_test = "2.0.0"
 test_utils = { path = "test_utils" }
 
-[workspace]
-members = [
-    "test_utils",
-]
+##[workspace]
+##members = [
+##    "test_utils",
+##]

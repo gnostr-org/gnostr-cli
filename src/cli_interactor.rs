@@ -14,6 +14,7 @@ pub trait InteractorPrompt {
     fn password(&self, parms: PromptPasswordParms) -> Result<String>;
     fn confirm(&self, params: PromptConfirmParms) -> Result<bool>;
     fn choice(&self, params: PromptChoiceParms) -> Result<usize>;
+    fn multi_choice(&self, params: PromptMultiChoiceParms) -> Result<Vec<usize>>;
 }
 impl InteractorPrompt for Interactor {
     fn input(&self, parms: PromptInputParms) -> Result<String> {
@@ -41,12 +42,29 @@ impl InteractorPrompt for Interactor {
         Ok(confirm)
     }
     fn choice(&self, parms: PromptChoiceParms) -> Result<usize> {
-        dialoguer::Select::with_theme(&self.theme)
+        let mut choice = dialoguer::Select::with_theme(&self.theme);
+        choice
             .with_prompt(parms.prompt)
             .report(parms.report)
-            .items(&parms.choices)
-            .interact()
-            .context("failed to get choice")
+            .items(&parms.choices);
+        if let Some(default) = parms.default {
+            if std::env::var("NGITTEST").is_err() {
+                choice.default(default);
+            }
+        }
+        choice.interact().context("failed to get choice")
+    }
+    fn multi_choice(&self, parms: PromptMultiChoiceParms) -> Result<Vec<usize>> {
+        // the colorful theme is not very clear so falling back to default
+        let mut choice = dialoguer::MultiSelect::default();
+        choice
+            .with_prompt(parms.prompt)
+            .report(parms.report)
+            .items(&parms.choices);
+        if let Some(defaults) = parms.defaults {
+            choice.defaults(&defaults);
+        }
+        choice.interact().context("failed to get choice")
     }
 }
 
@@ -110,6 +128,7 @@ impl PromptConfirmParms {
 pub struct PromptChoiceParms {
     pub prompt: String,
     pub choices: Vec<String>,
+    pub default: Option<usize>,
     pub report: bool,
 }
 
@@ -126,6 +145,42 @@ impl PromptChoiceParms {
     // }
     pub fn with_choices(mut self, choices: Vec<String>) -> Self {
         self.choices = choices;
+        self
+    }
+
+    pub fn with_default(mut self, index: usize) -> Self {
+        self.default = Some(index);
+        self
+    }
+}
+
+#[derive(Default)]
+pub struct PromptMultiChoiceParms {
+    pub prompt: String,
+    pub choices: Vec<String>,
+    pub defaults: Option<Vec<bool>>,
+    pub report: bool,
+}
+
+impl PromptMultiChoiceParms {
+    pub fn with_prompt<S: Into<String>>(mut self, prompt: S) -> Self {
+        self.prompt = prompt.into();
+        self.report = true;
+        self
+    }
+
+    pub fn dont_report(mut self) -> Self {
+        self.report = false;
+        self
+    }
+
+    pub fn with_choices(mut self, choices: Vec<String>) -> Self {
+        self.choices = choices;
+        self
+    }
+
+    pub fn with_defaults(mut self, defaults: Vec<bool>) -> Self {
+        self.defaults = Some(defaults);
         self
     }
 }
