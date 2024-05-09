@@ -1,15 +1,16 @@
 [package]
 name = "gnostr-cli"
-version = "0.0.20"
-edition = "2021"
-description = "gnostr-cli: git/nostr git2 command line utility"
-authors = ["DanConwayDev <DanConwayDev@protonmail.com>", "admin@gnostr.org <admin@gnostr.org>"]
-readme = "README.md"
-homepage = "https://github.com/gnostr-org/gnostr"
-repository = "https://github.com/gnostr-org/gnostr"
-license = "MIT"
-keywords = ["gnostr","nostr", "git"]
-categories = ["command-line-utilities","git"]
+authors = { workspace = true }
+version = { workspace = true }
+edition = { workspace = true }
+rust-version = { workspace = true }
+license = { workspace = true }
+readme = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+description = { workspace = true }
+documentation = { workspace = true }
+keywords = { workspace = true }
 
 [dependencies]
 anyhow = "1.0.75"
