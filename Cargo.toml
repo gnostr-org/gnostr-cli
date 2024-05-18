@@ -12,6 +12,16 @@ description = { workspace = true }
 documentation = { workspace = true }
 keywords = { workspace = true }
 
+## gnostr-cli
+[[bin]]
+name = "gnostr-cli"
+path = "src/main.rs"
+
+## git cli
+[[bin]]
+name = "git-cli"
+path = "src/main.rs"
+
 [dependencies]
 anyhow = "1.0.75"
 async-trait = "0.1.73"
