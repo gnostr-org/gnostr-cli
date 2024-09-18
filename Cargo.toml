@@ -1,5 +1,5 @@
 [package]
-name = "ngit"
+name = "gnostr-cli"
 version = "1.5.0"
 edition = "2021"
 description = "cli for code collaboration over nostr with nip34 support"
@@ -56,7 +56,7 @@ name = "ngit"
 path = "src/lib/mod.rs"
 
 [[bin]]
-name = "ngit"
+name = "gnostr-cli"
 path = "src/bin/ngit/main.rs"
 
 [[bin]]

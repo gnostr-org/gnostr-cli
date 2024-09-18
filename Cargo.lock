@@ -1161,6 +1161,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "gnostr-cli"
+version = "1.5.0"
+dependencies = [
+ "anyhow",
+ "assert_cmd",
+ "async-trait",
+ "auth-git2",
+ "chacha20poly1305",
+ "clap",
+ "console",
+ "dialoguer",
+ "directories",
+ "duplicate",
+ "futures",
+ "git2",
+ "indicatif",
+ "keyring",
+ "mockall",
+ "nostr",
+ "nostr-database",
+ "nostr-sdk",
+ "nostr-signer",
+ "nostr-sqlite",
+ "once_cell",
+ "passwords",
+ "scrypt",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "serial_test",
+ "test_utils",
+ "tokio",
+ "urlencoding",
+ "zeroize",
+]
+
+[[package]]
 name = "hashbrown"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1696,43 +1733,6 @@ name = "negentropy"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e664971378a3987224f7a0e10059782035e89899ae403718ee07de85bec42afe"
-
-[[package]]
-name = "ngit"
-version = "1.5.0"
-dependencies = [
- "anyhow",
- "assert_cmd",
- "async-trait",
- "auth-git2",
- "chacha20poly1305",
- "clap",
- "console",
- "dialoguer",
- "directories",
- "duplicate",
- "futures",
- "git2",
- "indicatif",
- "keyring",
- "mockall",
- "nostr",
- "nostr-database",
- "nostr-sdk",
- "nostr-signer",
- "nostr-sqlite",
- "once_cell",
- "passwords",
- "scrypt",
- "serde",
- "serde_json",
- "serde_yaml",
- "serial_test",
- "test_utils",
- "tokio",
- "urlencoding",
- "zeroize",
-]
 
 [[package]]
 name = "nix"
